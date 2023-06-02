@@ -4,7 +4,7 @@ require 'json'
 
 require 'faraday'
 
-REPO = 'redmine-patch-meetup/redmine-dev-mirror'
+REPO = 'agileware-jp/redmine-dev-mirror'
 
 WORKFLOW_RUN = JSON.parse ENV['WORKFLOW_RUN_JSON']
 
