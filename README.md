@@ -1,35 +1,37 @@
-# Redmineパッチ会
-
-Redmine本体の改善をできる人を増やし、Redmineパッチ会を継続的に行っていけることを目的として、2020年7月から基本毎月オンライン開催しています。
-
-基本は複数人のチームに分かれて、相談しながらパッチを書いています。  
-(一人でもOK、今後参加者を中心にやり方が変わっていくかも)
+# Agileware Redmine Mirror
 
 ## このリポジトリ
 
-オープンソースのプロジェクト管理システム、[Redmine](https://redmine.org/projects/redmine)のフォークリポジトリです。  
+Redmineパッチ会の[redmine-dev-mirror](https://github.com/redmine-patch-meetup/redmine-dev-mirror)のフォークリポジトリです。
+
 このリポジトリでRedmineのバグ修正や機能改善を行い、Redmine本体に取り込んでもらうことでRedmineをより良くしていけるよう活動しています。
+
+----
+
+以降はRedmineパッチ会の情報です。最新の情報は[redmine-dev-mirror](https://github.com/redmine-patch-meetup/redmine-dev-mirror)をご覧ください。
+
+----
 
 ## Redmineパッチ会に参加したい
 
-Redmineの改善に興味ある方であればどなたでも。  
-プログラミングせずに画面の文言変更でもパッチは送れます。  
+Redmineの改善に興味ある方であればどなたでも。
+プログラミングせずに画面の文言変更でもパッチは送れます。
 一緒に仕様を考えて、本家にチケットを作成するだけでもやれることはあります。 Ruby・Railsのプログラミング経験があると更に幅は広がります。
 
 初参加の場合、見学からでもお気軽にどうぞ(^^
 
 ### 1. Connpassでイベントを公開しているので、参加申し込みをしてみましょう！
 
-https://redmine-patch.connpass.com/  
+https://redmine-patch.connpass.com/
 
-### 2. 参加登録をしたら、オンラインのやりとり・当日の会場として利用しているDiscordに参加しよう！  
+### 2. 参加登録をしたら、オンラインのやりとり・当日の会場として利用しているDiscordに参加しよう！
 
-イベントに参加登録をした方にのみ参加用URLが確認可能です。  
+イベントに参加登録をした方にのみ参加用URLが確認可能です。
 参加の上で不安な点、わからない点があったらテキストチャンネルで気軽に相談してください👍
 
-### 3. チーム開発に参加できる環境を整えよう！(プログラミング以外での参加の場合は不要)  
+### 3. チーム開発に参加できる環境を整えよう！(プログラミング以外での参加の場合は不要)
 
-主に通話にDiscord、複数人でのコーディングにVisual Studio CodeのLive Share拡張を利用しています。  
+主に通話にDiscord、複数人でのコーディングにVisual Studio CodeのLive Share拡張を利用しています。
 **VSCodeのLive Shareでモブプロのように参加できるため、Redmineが動く開発環境がなくても参加できます。**
 
 * [Visual Studio Code](https://code.visualstudio.com/)をインストール
@@ -145,7 +147,7 @@ index 1a1e0cb4a..fedbe7d15 100644
      :selenium, using: :chrome, screen_size: [1024, 900],
      options: options
    )
- 
+
    setup do
 +    Capybara.app_host = "http://#{Capybara.server_host}:#{Capybara.server_port}"
      # Allow defining a custom app host (useful when using a remote Selenium hub)
