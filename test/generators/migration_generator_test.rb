@@ -33,7 +33,10 @@ class MigrationGeneratorTest < Rails::Generators::TestCase
 
     assert_name g, 'AddMigrationTable', :migration
 
-    g.create_migration_file
+    capture(:stdout) do
+      g.create_migration_file
+    end
+
     path_names = (Redmine::Plugin.directory / 'migration_demo/db/migrate')
       .glob('*_add_migration_table.rb')
 
