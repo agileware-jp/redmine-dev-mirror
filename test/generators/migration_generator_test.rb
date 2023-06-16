@@ -27,9 +27,17 @@ class MigrationGeneratorTest < Rails::Generators::TestCase
   destination TMP_DIR
   setup :prepare_destination
 
+  setup do
+    @plugin_directory = Redmine::Plugin.directory
+    Redmine::Plugin.directory = TMP_DIR
+  end
+
+  teardown do
+    Redmine::Plugin.directory = @plugin_directory
+  end
+
   def test_migration_file_name_is_snake_case
     g = generator ['MigrationDemo', 'AddMigrationTable']
-    Redmine::Plugin.directory = TMP_DIR
 
     assert_name g, 'AddMigrationTable', :migration
 
