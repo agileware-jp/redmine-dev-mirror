@@ -24,7 +24,6 @@ class RedminePluginModelGenerator < Rails::Generators::NamedBase
   class_option :migration,  :type => :boolean, :default => true
   class_option :timestamps, :type => :boolean
   class_option :parent,     :type => :string, :desc => "The parent class for the generated model"
-  class_option :indexes,    :type => :boolean, :default => true, :desc => "Add indexes for references and belongs_to columns"
 
   attr_reader :plugin_path, :plugin_name, :plugin_pretty_name
 
@@ -45,13 +44,13 @@ class RedminePluginModelGenerator < Rails::Generators::NamedBase
     return unless options[:migration]
 
     migration_filename = "%.14d_#{@migration_filename}.rb" % migration_number
-    template "migration.rb", "#{plugin_path}/db/migrate/#{migration_filename}"
+    template "migration.rb.erb", "#{plugin_path}/db/migrate/#{migration_filename}"
   end
 
   private
 
   def attributes_with_index
-    attributes.select {|a| a.has_index? || (a.reference? && options[:indexes])}
+    attributes.select {|a| a.has_index?}
   end
 
   def migration_number
