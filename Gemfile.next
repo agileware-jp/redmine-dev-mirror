@@ -5,7 +5,7 @@ source 'https://rubygems.org'
 
 ruby '>= 2.7.0', '< 3.3.0'
 
-gem 'rails', '6.1.7.3'
+gem 'rails', '7.0.6'
 gem 'next_rails'
 gem 'rouge', '~> 4.1.0'
 gem 'request_store', '~> 1.5.0'
@@ -111,8 +111,8 @@ group :test do
   gem "selenium-webdriver", "~> 3.142.7"
   gem 'webdrivers', '4.6.1', require: false
   # RuboCop
-  gem 'rubocop', '~> 1.52.0', require: false
-  gem 'rubocop-performance', '~> 1.18.0', require: false
+  gem 'rubocop', '~> 1.51.0', require: false
+  gem 'rubocop-performance', '~> 1.17.1', require: false
   gem 'rubocop-rails', '~> 2.19.1', require: false
 end
 
