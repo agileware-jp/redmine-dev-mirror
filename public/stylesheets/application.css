@@ -865,6 +865,18 @@ ul.twofa_backup_codes code { font-size: 16px; line-height: 2em }
   width: 270px;
 }
 
+#custom_field_tracker_ids {
+  max-height: 200px;
+  overflow: auto;
+}
+
+.splitcontent .tabular label.floating{
+  font-weight: normal;
+  margin-left: 0px;
+  text-align: left;
+  width: 200px;
+}
+
 label.block {
   display: block;
   width: auto !important;
