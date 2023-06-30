@@ -1,4 +1,3 @@
-
 <fieldset class="box tabular" id="custom_field_tracker_ids"><legend><%= toggle_checkboxes_link("#custom_field_tracker_ids input[type=checkbox]") %><%=l(:label_tracker_plural)%></legend>
   <% tracker_ids = @custom_field.tracker_ids %>
   <% Tracker.sorted.each do |tracker| %>
