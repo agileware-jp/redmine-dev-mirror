@@ -24,6 +24,8 @@ module Redmine
         base.class_eval do
           scope :roots, lambda {where :parent_id => nil}
           scope :leaves, lambda {where "#{table_name}.rgt - #{table_name}.lft = ?", 1}
+
+          has_many :children, -> { order(:lft) }, class_name: self.class_name, foreign_key: 'parent_id'
         end
       end
 
@@ -45,15 +47,6 @@ module Redmine
       # Returns the root element (ancestor with no parent)
       def root
         self_and_ancestors.first
-      end
-
-      # Returns the children
-      def children
-        if id.nil?
-          nested_set_scope.none
-        else
-          self.class.order(:lft).where(:parent_id => id)
-        end
       end
 
       # Returns the descendants that have no children
