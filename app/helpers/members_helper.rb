@@ -18,24 +18,26 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 module MembersHelper
+  def principals_for_new_member_ids(project, limit=100)
+    fetch_principals(project, limit)[:principals]
+  end
+
   def render_principals_for_new_members(project, limit=100)
-    scope = Principal.active.visible.sorted.not_member_of(project).like(params[:q])
-    principal_count = scope.count
-    principal_pages = Redmine::Pagination::Paginator.new principal_count, limit, params['page']
-    principals = scope.offset(principal_pages.offset).limit(principal_pages.per_page).to_a
+    result = fetch_principals(project, limit)
+
     s =
       content_tag(
         'div',
         content_tag(
           'div',
-          principals_check_box_tags('membership[user_ids][]', principals),
+          principals_check_box_tags('membership[user_ids][]', result[:principals]),
           :id => 'principals'
         ),
         :class => 'objects-selection'
       )
     links =
-      pagination_links_full(principal_pages,
-                            principal_count,
+      pagination_links_full(result[:principal_pages],
+                            result[:principal_count],
                             :per_page_links => false) do |text, parameters, options|
         link_to(
           text,
@@ -61,5 +63,16 @@ module MembersHelper
     if content.present?
       content_tag('em', content.join(", "), :class => "info")
     end
+  end
+
+  private
+
+  def fetch_principals(project, limit)
+    scope = Principal.active.visible.sorted.not_member_of(project).like(params[:q])
+    principal_count = scope.count
+    principal_pages = Redmine::Pagination::Paginator.new principal_count, limit, params['page']
+    principals = scope.offset(principal_pages.offset).limit(principal_pages.per_page).to_a
+
+    { principals: principals, principal_pages: principal_pages, principal_count: principal_count }
   end
 end
