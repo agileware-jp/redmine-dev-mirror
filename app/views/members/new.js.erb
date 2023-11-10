@@ -1,2 +1,59 @@
 $('#ajax-modal').html('<%= escape_javascript(render :partial => 'members/new_modal') %>');
 showModal('ajax-modal', '90%');
+
+function cancelSelect(button) {
+  const userId = $(button).parent().data('user-id')
+
+  removeMember(userId)
+  updateSelectedMember()
+}
+
+function removeMember(userId) {
+  const selectedMembers = $('#principals_for_selected_member')
+
+  $(selectedMembers).find(`[data-user-id="${userId}"]`).remove()
+  $('#principals').find(`input[type="checkbox"][value="${userId}"]`)?.prop('checked', false)
+}
+
+function updateSelectedMember() {
+  const selectedMembers = $('#principals_for_selected_member')
+
+  if($(selectedMembers).children().length > 1) {
+    $(selectedMembers).find(`[data-user-id=""]`).remove()
+  }
+
+  if ($(selectedMembers).children().length === 0) {
+    $(selectedMembers).append('<li data-user-id="" style="margin-left: 1rem;">未選択</li>')
+  }
+}
+
+function addMember({ userId, userName }) {
+  const selectedMembers = $('#principals_for_selected_member')
+  const cancelButton = `
+      <button onclick="cancelSelect(this); return false;" class="cancel-button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="4" x2="4" y2="12"></line>
+          <line x1="4" y1="4" x2="12" y2="12"></line>
+        </svg>
+      </button>
+      `
+
+  $(selectedMembers).append(`<li data-user-id='${userId}'>${cancelButton}${userName}</li>`)
+}
+
+$(document).ready(function() {
+  $("input[name='membership[user_ids][]']").on('change', function() {
+    const selectedMembers = $('#principals_for_selected_member')
+
+    const userId = $(this).val()
+    const userName = $(this).parent().text().trim()
+
+    if ($(this).is(":checked")) {
+      addMember({ userId, userName })
+    } else {
+      removeMember(userId)
+      }
+
+    updateSelectedMember()
+  })
+})
