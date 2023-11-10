@@ -1,9 +1,8 @@
 <fieldset class="box principals_for_selected_member">
-  <%# TODO: localに置く %>
-  <legend><label>選択済みユーザー</label></legend>
+  <legend><label><%= t('label_selected_member') %></label></legend>
   <ul id="principals_for_selected_member">
     <li data-user-id="" style="margin-left: 1rem;">
-      未選択
+      <%= t('text_unselect') %>
     </li>
   </ul>
 </fieldset>

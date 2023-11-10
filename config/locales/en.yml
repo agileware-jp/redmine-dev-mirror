@@ -1011,6 +1011,7 @@ en:
   label_subtask_plural: Subtasks
   label_project_copy_notifications: Send email notifications during the project copy
   label_import_notifications: Send email notifications during the import
+  label_selected_member: "Selected users"
   label_principal_search: "Search for user or group:"
   label_user_search: "Search for user:"
   label_additional_workflow_transitions_for_author: Additional transitions allowed when the user is the author
@@ -1324,6 +1325,7 @@ en:
   text_no_subject: no subject
   text_allowed_queries_to_select: Public (to any users) queries only selectable
   text_setting_config_change: You can configure the behaviour in config/configuration.yml. Please restart the application after editing it.
+  text_unselect: "unselect"
 
   default_role_manager: Manager
   default_role_developer: Developer

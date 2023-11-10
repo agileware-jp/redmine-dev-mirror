@@ -23,7 +23,7 @@ function updateSelectedMember() {
   }
 
   if ($(selectedMembers).children().length === 0) {
-    $(selectedMembers).append('<li data-user-id="" style="margin-left: 1rem;">未選択</li>')
+    $(selectedMembers).append('<li data-user-id="" style="margin-left: 1rem;"><%= t('text_unselect') %></li>')
   }
 }
 
