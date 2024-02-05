@@ -809,6 +809,7 @@ ja:
   label_api_access_key_created_on: "APIアクセスキーは%{value}前に作成されました"
   label_subtask_plural: 子チケット
   label_project_copy_notifications: コピーしたチケットのメール通知を送信する
+  label_selected_member: "選択済みユーザー"
   label_principal_search: "ユーザーまたはグループの検索:"
   label_user_search: "ユーザーの検索:"
   label_git_report_last_commit: ファイルとディレクトリの最新コミットを表示する
@@ -941,6 +942,7 @@ ja:
   text_scm_command_version: バージョン
   text_scm_config: バージョン管理システムのコマンドをconfig/configuration.ymlで設定できます。設定後、Redmineを再起動してください。
   text_scm_command_not_available: バージョン管理システムのコマンドが利用できません。管理画面にて設定を確認してください。
+  text_unselect: "未選択"
 
   default_role_manager: 管理者
   default_role_developer: 開発者

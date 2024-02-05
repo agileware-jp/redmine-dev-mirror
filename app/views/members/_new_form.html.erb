@@ -1,3 +1,11 @@
+<fieldset class="box principals_for_selected_member">
+  <legend><label><%= t('label_selected_member') %></label></legend>
+  <ul id="principals_for_selected_member">
+    <li data-user-id="" style="margin-left: 1rem;">
+      <%= t('text_unselect') %>
+    </li>
+  </ul>
+</fieldset>
 <fieldset class="box">
   <legend><%= label_tag("principal_search", l(:label_principal_search)) %></legend>
   <p><%= text_field_tag('principal_search', nil) %></p>

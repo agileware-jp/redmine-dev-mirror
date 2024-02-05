@@ -330,6 +330,6 @@ class MembersControllerTest < Redmine::ControllerTest
       :xhr => true
     )
     assert_response :success
-    assert_include 'User Misc', response.body
+    assert_includes response.body, 'value=8'
   end
 end
