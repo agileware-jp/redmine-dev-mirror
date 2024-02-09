@@ -153,7 +153,8 @@ module Redmine
       def issues
         @issues ||= @query.issues(
           :order => ["#{Project.table_name}.lft ASC", "#{Issue.table_name}.id ASC"],
-          :limit => @max_rows
+          :limit => @max_rows,
+          :include => [:children],
         )
       end
 
