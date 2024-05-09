@@ -330,6 +330,6 @@ class MembersControllerTest < Redmine::ControllerTest
       :xhr => true
     )
     assert_response :success
-    assert_include 'User Misc', response.body
+    assert ['value=8', 'value=9'].all? { |value| response.body.include?(value) } # These users are defined in the test/fixtures/users.yml file, lines 119-150.
   end
 end
