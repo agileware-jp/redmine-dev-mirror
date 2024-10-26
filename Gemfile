@@ -91,6 +91,10 @@ group :development do
   gem 'listen', '~> 3.3'
   gem 'yard', require: false
   gem 'svg_sprite', require: false
+  gem "guard"
+  gem "guard-minitest"
+  gem "pry", "<= 0.12.2" if RUBY_VERSION < '2.4'
+  gem "pry-byebug"
 end
 
 group :test do
