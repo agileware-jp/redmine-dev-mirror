@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: Install gems
         run: sudo gem install faraday
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Comment Patch URL
         run: ./.github/actions/comment_patch_url.rb
         env:

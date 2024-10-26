@@ -11,7 +11,7 @@ jobs:
   create-patch:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Create Patch
@@ -30,7 +30,7 @@ jobs:
         env:
           AUTHOR_EMAIL: ${{ github.event.head_commit.author.email }}
           AUTHOR_NAME: ${{ github.event.head_commit.author.name }}
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: patch
           path: ${{ steps.patch-creator.outputs.PATCH_FILE }}
