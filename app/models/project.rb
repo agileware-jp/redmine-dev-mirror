@@ -382,6 +382,7 @@ class Project < ApplicationRecord
     @override_members = nil
     @assignable_users = nil
     @last_activity_date = nil
+    self.class.clear_last_activities
     base_reload(*args)
   end
 
@@ -1009,18 +1010,16 @@ class Project < ApplicationRecord
     end
   end
 
-  def last_activity_date
-    @last_activity_date || fetch_last_activity_date
+  def self.last_activities
+    @last_activities ||= Redmine::Activity::Fetcher.new(User.current).events(nil, nil, :last_by_project => true).to_h
   end
 
-  # Preloads last activity date for a collection of projects
-  def self.load_last_activity_date(projects, user=User.current)
-    if projects.any?
-      last_activities = Redmine::Activity::Fetcher.new(User.current).events(nil, nil, :last_by_project => true).to_h
-      projects.each do |project|
-        project.instance_variable_set(:@last_activity_date, last_activities[project.id])
-      end
-    end
+  def self.clear_last_activities
+    @last_activities = nil
+  end
+
+  def last_activity_date
+    self.class.last_activities[id] || fetch_last_activity_date
   end
 
   private
