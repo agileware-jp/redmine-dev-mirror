@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 ruby '>= 3.1.0', '< 3.4.0'
 
-gem 'rails', '7.2.1.2'
+gem 'rails', '7.2.2'
 gem 'rouge', '~> 4.2'
 gem 'mini_mime', '~> 1.1.0'
 gem "actionpack-xml_parser"
@@ -109,7 +109,7 @@ group :test do
   # RuboCop
   gem 'rubocop', '~> 1.67.0', require: false
   gem 'rubocop-performance', '~> 1.22.0', require: false
-  gem 'rubocop-rails', '~> 2.26.0', require: false
+  gem 'rubocop-rails', '~> 2.27.0', require: false
 end
 
 local_gemfile = File.join(File.dirname(__FILE__), "Gemfile.local")
