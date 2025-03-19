@@ -20,22 +20,6 @@
 require_relative '../test_helper'
 
 class ContextMenusControllerTest < Redmine::ControllerTest
-  fixtures :projects,
-           :trackers,
-           :projects_trackers,
-           :roles,
-           :member_roles,
-           :members,
-           :enabled_modules,
-           :workflows,
-           :journals, :journal_details,
-           :versions,
-           :issues, :issue_statuses, :issue_categories,
-           :users,
-           :enumerations,
-           :time_entries,
-           :custom_fields, :custom_fields_trackers, :custom_fields_projects
-
   def test_context_menu_one_issue_should_link_to_issue_path
     @request.session[:user_id] = 2
     get(
@@ -221,7 +205,7 @@ class ContextMenusControllerTest < Redmine::ControllerTest
       assert_select 'a[href="#"]', :text => 'List'
       assert_select 'ul' do
         assert_select 'a', 3
-        assert_select 'a.icon.icon-checked', :text => 'Bar'
+        assert_select 'a.icon', :text => 'Bar'
       end
     end
   end

@@ -6,18 +6,32 @@
 
 @font-face {
   font-family: "Noto Sans";
-  src: url("/NotoSans-VariableFont_wdth,wght.woff2") format("woff2");
-  font-weight: 100 900;
-  font-stretch: 75% 125%;
+  src: url("/NotoSans-Regular.woff2") format("woff2");
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Noto Sans";
-  src: url("/NotoSans-Italic-VariableFont_wdth,wght.woff2") format("woff2");
-  font-weight: 100 900;
-  font-stretch: 75% 125%;
+  src: url("/NotoSans-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Noto Sans";
+  src: url("/NotoSans-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Noto Sans";
+  src: url("/NotoSans-BoldItalic.woff2") format("woff2");
+  font-weight: 700;
   font-style: italic;
   font-display: swap;
 }
@@ -142,7 +156,8 @@ pre, code {font-family: Consolas, Menlo, "Liberation Mono", Courier, monospace;}
 @media screen and (min-width: 1600px) and (max-width: 1919px) {#sidebar{width: 320px;}}
 @media screen and (min-width: 1920px) and (max-width: 2559px) {#sidebar{width: 360px;}}
 @media screen and (min-width: 2560px) {#sidebar{width: 380px;}}
-#sidebar h3{ font-size: 0.875rem; margin-top:14px; color: #555; }
+#sidebar h3{ font-size: 0.875rem; margin-top: 14px; color: #555; }
+#sidebar h3:first-child{ margin-top: 0; }
 #sidebar hr{ width: 100%; margin: 0 auto; height: 1px; background: #ccc; border: 0; }
 #sidebar .contextual { margin-right: 1em; }
 #sidebar ul, ul.flat {margin: 0;  padding: 0;}
@@ -154,9 +169,32 @@ pre, code {font-family: Consolas, Menlo, "Liberation Mono", Courier, monospace;}
 #sidebar span.icon-warning {margin-left: 5px;}
 #sidebar li input[type=checkbox] {height: 20px;}
 
+#sidebar-switch-panel {
+  margin-left: -20px;
+  padding-right: 28px;
+  width: 100%;
+}
+
+#sidebar-switch-button {
+  display: block;
+  padding: 3px 0;
+  padding-right: 28px;
+  width: 100%;
+}
+
+#sidebar-switch-button svg {
+  stroke: #555;
+}
+
+#sidebar-switch-button:hover {
+  background-color: #eeeeee;
+}
+
 #content { flex-grow: 1; background-color: #fff; margin: 0px; padding: 10px 16px 10px 16px; overflow-x: auto;}
 
-#main.nosidebar #sidebar{ display: none; }
+#main.nosidebar #sidebar { display: none; }
+#main.collapsedsidebar #sidebar { width: 0; padding-right: 0 }
+#main.collapsedsidebar #sidebar-wrapper { display: none; }
 
 #footer {clear: both; border-top: 1px solid #d0d7de; font-size: 0.9em; color: #aaa; padding: 5px; text-align:center; background:#fff;}
 
@@ -202,9 +240,9 @@ a.user.user-mention {
 #admin-menu a {line-height:1.7em;}
 #admin-menu a.selected:not(:has(svg))  {padding-left: 20px !important; background-position: 2px 40%;}
 
-a.collapsible {padding-left: 12px; }
-
 a#toggle-completed-versions {color:#999;}
+a#toggle-completed-versions span.icon-label {margin-left: 0}
+a#toggle-completed-versions svg, a#toggle-completed-versions:hover svg {stroke:#999}
 
 /***** Dropdown *****/
 .drdn {position:relative;}
@@ -232,7 +270,9 @@ a#toggle-completed-versions {color:#999;}
 }
 .drdn.expanded .drdn-content {display:block;}
 
-.drdn-content .quick-search {margin:8px;}
+.drdn-content .quick-search {margin:8px; display: flex; align-items: center;}
+.drdn-content .quick-search svg {margin-left: 5px; position: absolute;}
+.drdn-content .quick-search input.autocomplete {background: none; padding-left: 24px !important;}
 .drdn-content .autocomplete {box-sizing: border-box; width:100% !important; height:28px;}
 .drdn-content .autocomplete:focus {border-color:#5ad;}
 .drdn-items {max-height:400px; overflow:auto;}
@@ -336,9 +376,12 @@ tr.issue td.relations { text-align: left; }
 tr.issue td.done_ratio table.progress { margin-left:auto; margin-right: auto;}
 tr.issue td.relations span, tr.issue td.watcher_users a {white-space: nowrap;}
 tr.issue td.watcher_users ul {list-style: none; padding: 0; margin: 0}
+tr.issue.created-by-me td.author {font-weight: bold;}
+tr.issue.assigned-to-me td.assigned_to {font-weight: bold;}
+tr.issue.assigned-to-my-group td.assigned_to {font-weight: bold;}
 table.issues td.block_column {color:#777; font-size:90%; padding:4px 4px 4px 24px; text-align:left; white-space:normal;}
-table.issues td.block_column span {font-weight: bold; display: block; margin-bottom: 4px;}
-table.issues td.block_column pre {white-space:normal;}
+table.issues td.block_column>span {font-weight: bold; display: block; margin-bottom: 4px;}
+table.issues td.block_column>pre {white-space:normal;}
 
 tr.idnt td.subject, tr.idnt td.name {background: url(/arrow_right.png) no-repeat 2px 50%;}
 tr.idnt-1 td.subject, tr.idnt-1 td.name {padding-left: 24px; background-position: 8px 50%;}
@@ -386,17 +429,18 @@ tr.message { height: 2.6em; }
 tr.message td.created_on { white-space: nowrap; }
 tr.message td.last_message { font-size: 93%; white-space: nowrap; }
 tr.message.sticky td.subject { font-weight: bold; }
+tr.message td.subject:not(:has(.icon)) { padding-left: 20px; }
 
 body.avatars-on #replies .message.reply {padding-left: 32px;}
 #replies .reply:target h4.reply-header {background-color:#DDEEFF;}
 #replies h4 img.gravatar {margin-left:-32px;}
 
 tr.version.closed, tr.version.closed a { color: #999; }
-tr.version td.name:not(.icon-shared) { padding-left: 20px; }
+tr.version:not(.shared) td.name { padding-left: 20px; }
 tr.version td.date, tr.version td.status, tr.version td.sharing { text-align: center; white-space:nowrap; }
 
-tr.member td.icon-user, #principals_for_new_member .icon-user {background:transparent;}
-#principals_for_new_member svg {margin-right: 4px;}
+#principals_for_new_member .icon-user {background:transparent;}
+#principals_for_new_member svg, #principals_for_new_member img {margin-right: 4px;}
 
 tr.user td {width:13%;white-space: nowrap;}
 td.username, td.firstname, td.lastname, td.email {text-align:left !important;}
@@ -501,7 +545,10 @@ td.center {text-align:center;}
 
 #watchers select {width: 95%; display: block;}
 #watchers img.gravatar {margin: 0 4px 2px 0;}
+#watchers svg.icon-svg {margin: 0 2px 2px 0;}
 #users_for_watcher img.gravatar {padding-bottom: 2px; margin-right: 4px;}
+#users_for_watcher svg {margin-right: 4px;}
+#users_for_watcher span.icon-user {display: inline;}
 
 span#watchers_inputs {overflow:auto; display:block;}
 span.search_for_watchers {display:block;}
@@ -599,8 +646,8 @@ blockquote { font-style: italic; border-left: 3px solid #e0e0e0; padding-left: 0
 blockquote blockquote { margin-left: 0;}
 abbr, span.field-description[title] { border-bottom: 1px dotted #aaa; cursor: help; }
 textarea.wiki-edit {width:99%; resize:vertical; box-sizing: border-box;}
-body.textarea-monospace textarea.wiki-edit {font-family: Consolas, Menlo, "Liberation Mono", Courier, monospace; font-size: 0.75rem;}
-body.textarea-proportional textarea.wiki-edit {font-family: var(--fonts-main); font-size:  0.75rem;}
+body.textarea-monospace textarea.wiki-edit {font-family: Consolas, Menlo, "Liberation Mono", Courier, monospace;}
+body.textarea-proportional textarea.wiki-edit {font-family: var(--fonts-main);}
 li p {margin-top: 0;}
 div.issue {
   background: #ffffdd;
@@ -610,8 +657,8 @@ div.issue {
   border-radius: 3px;
   box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
-p.breadcrumb { font-size: 0.9em; margin: 4px 0 4px 0;}
-p.subtitle { font-size: 0.9em; margin: -6px 0 12px 0; font-style: italic; }
+p.breadcrumb { font-size: 0.8125rem; margin: 4px 0 4px 0;}
+p.subtitle { font-size: 0.8125rem; margin: -6px 0 12px 0; font-style: italic; }
 p.footnote { font-size: 0.9em; margin-top: 0px; margin-bottom: 0px; }
 .wiki-class-ltr {direction:ltr !important;}
 .wiki-class-rtl {direction:rtl !important;}
@@ -718,13 +765,14 @@ div.journal span.update-info {color: #666; font-size: 0.9em;}
 #history p.nodata {display: none;}
 
 div#activity dl, #search-results { margin-left: 2em; }
-div#activity dd, #search-results dd { margin-bottom: 1em; padding-left: 18px; font-size: 0.9em; }
+div#activity dd, #search-results dd { margin-bottom: 1em; padding-left: 22px; font-size: 0.8125rem;}
+div#activity dt svg.icon-svg {margin-right: 4px;}
 div#activity dt.me .time { border-bottom: 1px solid #999; }
-div#activity dt .time { color: #777; font-size: 93%; margin-right: 4px; }
-div#activity dd .description, #search-results dd .description { font-style: italic; }
-div#activity span.project:after, #search-results span.project:after { content: " -"; }
-div#activity dd span.description, #search-results dd span.description { display:block; color: #808080; }
-div#activity dt.grouped {margin-left:5em;}
+div#activity dt .time { color: #555; font-size: 0.8125rem; margin-right: 4px; }
+div#activity dd .description, #search-results dd .description { font-style: italic; margin: 2px 0;}
+div#activity span.project:after, #search-results span.project:after { content: " - "; white-space: pre;}
+div#activity dd span.description, #search-results dd span.description { display:block; color: #666; }
+div#activity dt.grouped {padding-left:5em;}
 div#activity dd.grouped {margin-left:9em;}
 div#activity h3 {
   padding: 5px;
@@ -734,6 +782,9 @@ div#activity dt {
   padding-top: 10px;
   border-top: 1px solid #eeeeee;
   width: 100%; /* Prevents border from disappearing due to inline-flex shrinking */
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-end;
 }
 div#activity dl dt:first-child {
   border: 0px;
@@ -1077,8 +1128,8 @@ div.attachments img { vertical-align: middle; }
 div.attachments span.author { font-size: 0.9em; color: #888; }
 
 div.thumbnails {margin:0.6em;}
-div.thumbnails div {background:#fff;border:2px solid #ddd;display:inline-block;margin-right:2px;}
-div.thumbnails img {margin: 3px; vertical-align: middle;}
+div.thumbnail {background:#fff;border:2px solid #ddd;display:inline-block;margin-right:2px;}
+div.thumbnail img {margin: 3px; vertical-align: middle;}
 #history div.thumbnails {margin-left: 2em;}
 
 p.other-formats { text-align: right; font-size:0.9em; color: #666; }
@@ -1102,7 +1153,7 @@ input#principal_search, input#user_search {width:90%}
 .roles-selection label {display:inline-block; width:210px;}
 
 input.autocomplete {
-  background: #fff url(/magnifier.png) no-repeat 2px 50%; padding-left:20px !important;
+  background: #fff url(/search.svg) no-repeat 2px 50%; padding-left:20px !important;
 }
 input.autocomplete.ajax-loading {
   background-image: url(/loading.gif);
@@ -1415,13 +1466,10 @@ button.tab-left.disabled, button.tab-right.disabled {
 }
 
 /***** Wiki *****/
-div.wiki {
-  font-variant-numeric: proportional-nums;
-  & table, & pre, & code, & ol>li::marker {
-    font-variant-numeric: tabular-nums;
-  }
-}
+div.wiki { font-variant-numeric: proportional-nums; }
+div.wiki table, div.wiki pre, div.wiki code, div.wiki ol>li::marker { font-variant-numeric: tabular-nums; }
 
+/* Wiki tables */
 div.wiki table {
   border-collapse: collapse;
   margin-bottom: 1em;
@@ -1586,7 +1634,7 @@ table.gantt-table td {
   height: 16px;
   overflow: hidden;
   white-space: nowrap;
-  text-overflow: ellipsis;
+  text-overflow: clip;
   width: 100%;
 }
 .gantt_subjects div.issue-subject:hover { background-color:#ffffdd; }
@@ -1707,6 +1755,10 @@ td.gantt_selected_column .gantt_hdr,.gantt_selected_column_container {
   vertical-align: middle;
 }
 
+.icon svg, .icon-only svg {
+  flex-shrink: 0;
+}
+
 a.icon:hover svg, a.icon-only:hover svg {
   stroke: #c61a1a;
 }
@@ -1719,7 +1771,7 @@ svg.icon-ok {
   stroke: #c61a1a
 }
 
-.icon-warning svg {
+.icon-warning svg.icon-svg {
   stroke: #e4bc4b;
 }
 
@@ -1732,33 +1784,31 @@ svg.icon-ok {
   stroke: #ffc400;
 }
 
-svg {
-  &.icon-svg {
-    stroke: #169;
-    fill: none;
-    stroke-width: 1.5;
-    vertical-align: middle;
-  }
+svg.icon-svg {
+  stroke: #169;
+  fill: none;
+  stroke-width: 1.5;
+  vertical-align: middle;
+}
 
-  &.s20 {
-    width: 1.25rem;
-    height: 1.25rem;
-  }
+svg.s20 {
+  width: 1.25rem;
+  height: 1.25rem;
+}
 
-  &.s18 {
-    width: 1.125rem;
-    height: 1.125rem;
-  }
+svg.s18 {
+  width: 1.125rem;
+  height: 1.125rem;
+}
 
-  &.s14 {
-    width: 0.875rem;
-    height: 0.875rem;
-  }
+svg.s14 {
+  width: 0.875rem;
+  height: 0.875rem;
+}
 
-  &.s12 {
-    width: 0.75rem;
-    height: 0.75rem;
-  }
+svg.s12 {
+  width: 0.75rem;
+  height: 0.75rem;
 }
 
 span.icon-label {
@@ -1802,7 +1852,7 @@ span.icon-label {
 .open .icon-folder:not(:has(svg)) { background-image: url(/folder_open.png); }
 .icon-package:not(:has(svg)) { background-image: url(/package.png); }
 .icon-user:not(:has(svg)) { background-image: url(/user.png); }
-.icon-project, .icon-projects:not(:has(svg)) { background-image: url(/projects.png); }
+.icon-project:not(:has(svg)), .icon-projects:not(:has(svg)) { background-image: url(/projects.png); }
 .icon-help:not(:has(svg)) { background-image: url(/help.png); }
 .icon-attachment:not(:has(svg)) { background-image: url(/attachment.png); }
 .icon-history:not(:has(svg)) { background-image: url(/history.png); }
@@ -1862,8 +1912,8 @@ span.icon-label {
 .icon-bookmarked-project:not(:has(svg)) { background-image: url(/tag_blue.png); }
 .icon-sorted-asc:not(:has(svg)) { background-image: url(/arrow_down.png); }
 .icon-sorted-desc:not(:has(svg)) { background-image: url(/arrow_up.png); }
-.icon-toggle-plus { background-image: url(/bullet_toggle_plus.png) }
-.icon-toggle-minus { background-image: url(/bullet_toggle_minus.png) }
+.icon-toggle-plus:not(:has(svg)) { background-image: url(/bullet_toggle_plus.png) }
+.icon-toggle-minus:not(:has(svg)) { background-image: url(/bullet_toggle_minus.png) }
 .icon-clear-query:not(:has(svg)) { background-image: url(/close_hl.png); }
 .icon-import:not(:has(svg)) { background-image: url(/database_go.png); }
 
@@ -1917,7 +1967,7 @@ div.gravatar-with-child > img.gravatar:nth-child(2) {
 h2 img.gravatar, h3 img.gravatar {margin-right: 4px;}
 h4 img.gravatar {margin: -2px 4px -4px 0;}
 td.username img.gravatar {margin: 0 0.5em 0 0; vertical-align: top;}
-#activity dt img.gravatar {float: left; margin: 0 1em 1em 0;}
+#activity dt img.gravatar {margin: 0 1em 0 0;}
 /* Used on 12px Gravatar img tags without the icon background */
 .icon-gravatar {float: left; margin-right: 4px;}
 

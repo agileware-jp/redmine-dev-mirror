@@ -482,15 +482,17 @@ class ApplicationController < ActionController::Base
   end
   helper_method :back_url
 
-  def redirect_back_or_default(default, options={})
+  def redirect_back_or_default(default, options = {})
+    referer = options.delete(:referer)
+
     if back_url = validate_back_url(params[:back_url].to_s)
       redirect_to(back_url)
       return
-    elsif options[:referer]
+    elsif referer
       redirect_to_referer_or default
       return
     end
-    redirect_to default
+    redirect_to default, options
     false
   end
 
@@ -509,11 +511,9 @@ class ApplicationController < ActionController::Base
         if uri.send(component).present? && uri.send(component) != request.send(component)
           return false
         end
-
-        uri.send(:"#{component}=", nil)
       end
-      # Always ignore basic user:password in the URL
-      uri.userinfo = nil
+      # Remove unnecessary components to convert the URL into a relative URL
+      uri.omit!(:scheme, :authority)
     rescue Addressable::URI::InvalidURIError
       return false
     end

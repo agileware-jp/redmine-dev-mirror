@@ -25,14 +25,6 @@ class Redmine::WikiFormatting::MacrosTest < Redmine::HelperTest
   include ERB::Util
   extend ActionView::Helpers::SanitizeHelper::ClassMethods
 
-  fixtures :projects, :roles, :enabled_modules, :users,
-           :repositories, :changesets,
-           :trackers, :issue_statuses, :issues,
-           :versions, :documents,
-           :wikis, :wiki_pages, :wiki_contents,
-           :boards, :messages,
-           :attachments, :enumerations
-
   def setup
     super
     @project = nil
@@ -148,12 +140,12 @@ class Redmine::WikiFormatting::MacrosTest < Redmine::HelperTest
 
   def test_macro_exception_should_be_displayed
     Redmine::WikiFormatting::Macros.macro :exception do |obj, args|
-      raise "My message"
+      raise "My exception's message"
     end
 
     text = "{{exception}}"
     assert_include(
-      '<div class="flash error">Error executing the <strong>exception</strong> macro (My message)</div>',
+      '<div class="flash error">Error executing the <strong>exception</strong> macro (My exception&#39;s message)</div>',
       textilizable(text)
     )
   end

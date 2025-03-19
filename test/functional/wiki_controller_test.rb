@@ -20,11 +20,6 @@
 require_relative '../test_helper'
 
 class WikiControllerTest < Redmine::ControllerTest
-  fixtures :projects, :users, :email_addresses, :roles, :members, :member_roles,
-           :enabled_modules, :wikis, :wiki_pages, :wiki_contents,
-           :wiki_content_versions, :attachments,
-           :issues, :issue_statuses, :trackers, :watchers
-
   def setup
     User.current = nil
   end
@@ -142,7 +137,8 @@ class WikiControllerTest < Redmine::ControllerTest
           assert_select 'a[class*=delete]'
         end
         assert_select 'li.user-10' do
-          assert_select 'img.gravatar[title=?]', 'A Team', is_display_gravatar
+          assert_select 'a.group', :text => 'A Team'
+          assert_select 'svg'
           assert_select 'a[href="/users/10"]', false
           assert_select 'a[class*=delete]'
         end

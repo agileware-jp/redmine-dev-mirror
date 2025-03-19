@@ -26,31 +26,27 @@ module Redmine
       # configuration of the rendering pipeline
       PIPELINE_CONFIG = {
         # https://github.com/gjtorikian/commonmarker#extension-options
-        commonmarker_extensions: [
-          :table,
-          :strikethrough,
-          :tagfilter,
-          :autolink
-        ].freeze,
+        commonmarker_extensions: {
+          table: true,
+          strikethrough: true,
+          tagfilter: true,
+          autolink: true,
+          footnotes: true,
+        }.freeze,
 
         # https://github.com/gjtorikian/commonmarker#parse-options
-        commonmarker_parse_options: [
-          :FOOTNOTES,
-          :STRIKETHROUGH_DOUBLE_TILDE,
-          :UNSAFE,
-          :VALIDATE_UTF8
-        ].freeze,
+        commonmarker_parse_options: {
+        }.freeze,
 
         # https://github.com/gjtorikian/commonmarker#render-options
-        commonmarker_render_options: [
-          :UNSAFE
-        ],
+        commonmarker_render_options: {
+          unsafe: true,
+          hardbreaks: Redmine::Configuration['common_mark_enable_hardbreaks'] == true,
+        }.freeze,
+        commonmarker_plugins: {
+          syntax_highlighter: nil
+        }.freeze,
       }.freeze
-
-      if Redmine::Configuration['common_mark_enable_hardbreaks'] == true
-        PIPELINE_CONFIG[:commonmarker_render_options].push(:HARDBREAKS)
-      end
-      PIPELINE_CONFIG[:commonmarker_render_options].freeze
 
       MarkdownPipeline = HTML::Pipeline.new [
         MarkdownFilter,

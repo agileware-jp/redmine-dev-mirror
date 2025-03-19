@@ -20,9 +20,6 @@
 require_relative '../test_helper'
 
 class MessagesControllerTest < Redmine::ControllerTest
-  fixtures :projects, :users, :email_addresses, :user_preferences, :members, :member_roles, :roles, :boards, :messages, :enabled_modules,
-           :watchers
-
   def setup
     User.current = nil
   end
@@ -106,7 +103,8 @@ class MessagesControllerTest < Redmine::ControllerTest
           assert_select 'a[class*=delete]'
         end
         assert_select "li.user-10" do
-          assert_select 'img.gravatar[title=?]', 'A Team', is_display_gravatar
+          assert_select 'a.group', :text => 'A Team'
+          assert_select 'svg'
           assert_select 'a[href="/users/10"]', false
           assert_select 'a[class*=delete]'
         end

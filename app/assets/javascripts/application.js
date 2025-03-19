@@ -67,6 +67,7 @@ function collapseAllRowGroups(el) {
     if ($(this).hasClass('group')) {
       $(this).removeClass('open');
       $(this).find('.expander').switchClass('icon-expanded', 'icon-collapsed');
+      updateSVGIcon($(this).find('.expander')[0], 'angle-right')
     } else {
       $(this).hide();
     }
@@ -79,6 +80,7 @@ function expandAllRowGroups(el) {
     if ($(this).hasClass('group')) {
       $(this).addClass('open');
       $(this).find('.expander').switchClass('icon-collapsed', 'icon-expanded');
+      updateSVGIcon($(this).find('.expander')[0], 'angle-down')
     } else {
       $(this).show();
     }
@@ -209,9 +211,20 @@ function buildFilterRow(field, operator, values) {
   case "list_optional_with_history":
   case "list_status":
   case "list_subprojects":
+    const iconType = values.length > 1 ? 'toggle-minus' : 'toggle-plus';
+    const clonedIcon = document.querySelector('#icon-copy-source svg').cloneNode(true);
+    updateSVGIcon(clonedIcon, iconType);
+
     tr.find('.values').append(
-      '<span style="display:none;"><select class="value" id="values_'+fieldId+'_1" name="v['+field+'][]"></select>' +
-      ' <span class="toggle-multiselect icon-only '+(values.length > 1 ? 'icon-toggle-minus' : 'icon-toggle-plus')+'">&nbsp;</span></span>'
+      $('<span>', { style: 'display:none;' }).append(
+        $('<select>', {
+          class: 'value',
+          id: `values_${fieldId}_1`,
+          name: `v[${field}][]`,
+        }),
+        '\n',
+        $('<span>', { class: `toggle-multiselect icon-only icon-${iconType}` }).append(clonedIcon)
+      )
     );
     select = tr.find('.values select');
     if (values.length > 1) { select.attr('multiple', true); }
@@ -760,8 +773,10 @@ $(document).ready(function(){
     } else {
       $(".drdn").removeClass("expanded");
       drdn.addClass("expanded");
-      selected = $('.drdn-items a.selected'); // Store selected project
-      selected.focus(); // Calling focus to scroll to selected project
+      if ($(this).parent('#project-jump').length) {
+        selected = $('.drdn-items a.selected'); // Store selected project
+        selected.focus(); // Calling focus to scroll to selected project
+      }
       if (!isMobile()) {
         drdn.find(".autocomplete").focus();
       }
@@ -1008,12 +1023,16 @@ function toggleDisabledInit() {
   $('input[data-disables], input[data-enables], input[data-shows]').each(toggleDisabledOnChange);
 }
 function toggleMultiSelectIconInit() {
-  $('.toggle-multiselect:not(.icon-toggle-minus), .toggle-multiselect:not(.icon-toggle-plus)').each(function(){
-    if ($(this).siblings('select').find('option:selected').length > 1){
-      $(this).addClass('icon-toggle-minus');
+  $('.toggle-multiselect:not(.icon-toggle-minus):not(.icon-toggle-plus)').each(function(){
+    let iconType;
+    if ($(this).siblings('select').find('option:selected').length > 1) {
+      iconType = 'toggle-minus';
     } else {
-      $(this).addClass('icon-toggle-plus');
+      iconType = 'toggle-plus';
     }
+
+    $(this).addClass(`icon-${iconType}`);
+    updateSVGIcon($(this).find('svg')[0], iconType);
   });
 }
 
@@ -1059,6 +1078,7 @@ $(document).ready(function(){
   $('#content').on('click', '.toggle-multiselect', function() {
     toggleMultiSelect($(this).siblings('select'));
     $(this).toggleClass('icon-toggle-plus icon-toggle-minus');
+    updateSVGIcon($(this).find('svg')[0], $(this).hasClass('icon-toggle-plus') ? 'toggle-plus' : 'toggle-minus');
   });
   toggleMultiSelectIconInit();
 
@@ -1128,6 +1148,7 @@ function setupAttachmentDetail() {
 }
 
 function setupWikiTableSortableHeader() {
+  if (typeof Tablesort === 'undefined') { return; }
   $('div.wiki table').each(function(i, table){
     if (table.rows.length < 3) return true;
     var tr = $(table.rows).first();
@@ -1260,6 +1281,77 @@ function inlineAutoComplete(element) {
 
     tribute.attach(element);
 }
+
+// collapsible sidebar jQuery plugin
+(function($) {
+  // main container this is applied to
+  var main;
+  // triggers show/hide
+  var button;
+  // the key to use in local storage
+  // this will later be expanded using the current controller and action to
+  // allow for different sidebar states for different pages
+  var localStorageKey = 'redmine-sidebar-state';
+  // true if local storage is available
+  var canUseLocalStorage = function(){
+    try {
+      if('localStorage' in window){
+        localStorage.setItem('redmine.test.storage', 'ok');
+        var item = localStorage.getItem('redmine.test.storage');
+        localStorage.removeItem('redmine.test.storage');
+        if(item === 'ok') return true;
+      }
+    } catch (err) {}
+    return false;
+  }();
+  // function to set current sidebar state
+  var setState = function(state){
+    if(canUseLocalStorage){
+      localStorage.setItem(localStorageKey, state);
+    }
+  };
+  var applyState = function(){
+    if(main.hasClass('collapsedsidebar')){
+      updateSVGIcon(document.getElementById('sidebar-switch-button'), 'chevrons-left')
+      setState('hidden');
+    } else {
+      updateSVGIcon(document.getElementById('sidebar-switch-button'), 'chevrons-right')
+      setState('visible');
+    }
+  };
+  var setupToggleButton = function(){
+    button = $('#sidebar-switch-button');
+    button.click(function(e){
+      main.addClass("animate");
+      main.toggleClass('collapsedsidebar');
+      applyState();
+      e.preventDefault();
+      return false;
+    });
+    applyState();
+  };
+  $.fn.collapsibleSidebar = function() {
+    main = this;
+    // determine previously stored sidebar state for this page
+    if(canUseLocalStorage) {
+      // determine current controller/action pair and use them as storage key
+      var bodyClass = $('body').attr('class');
+      if(bodyClass){
+        try {
+          localStorageKey += '-' + bodyClass.split(/\s+/).filter(function(s){
+            return s.match(/(action|controller)-.*/);
+          }).sort().join('-');
+        } catch(e) {
+          // in case of error (probably IE8), continue with the unmodified key
+        }
+      }
+      var storedState = localStorage.getItem(localStorageKey);
+      main.toggleClass('collapsedsidebar', storedState === 'hidden');
+    }
+    // draw the toggle button once the DOM is complete
+    $(document).ready(setupToggleButton);
+  };
+}(jQuery));
 
 $(document).ready(setupAjaxIndicator);
 $(document).ready(hideOnLoad);

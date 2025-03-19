@@ -20,20 +20,9 @@
 require_relative '../../../../../test_helper'
 
 class Redmine::WikiFormatting::CommonMark::ApplicationHelperTest < Redmine::HelperTest
-  if Object.const_defined?(:CommonMarker)
+  if Object.const_defined?(:Commonmarker)
 
     include ERB::Util
-
-    fixtures :projects, :enabled_modules,
-             :users, :email_addresses,
-             :members, :member_roles, :roles,
-             :repositories, :changesets,
-             :projects_trackers,
-             :trackers, :issue_statuses, :issues, :versions, :documents, :journals,
-             :wikis, :wiki_pages, :wiki_contents,
-             :boards, :messages, :news,
-             :attachments, :enumerations,
-             :custom_values, :custom_fields, :custom_fields_projects
 
     def setup
       super

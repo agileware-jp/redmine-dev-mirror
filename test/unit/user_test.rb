@@ -20,18 +20,6 @@
 require_relative '../test_helper'
 
 class UserTest < ActiveSupport::TestCase
-  fixtures :users, :email_addresses, :members, :projects, :roles, :member_roles, :auth_sources,
-           :trackers, :issue_statuses,
-           :projects_trackers,
-           :watchers,
-           :issue_categories, :enumerations, :issues,
-           :journals, :journal_details,
-           :groups_users,
-           :enabled_modules,
-           :tokens,
-           :user_preferences,
-           :custom_fields, :custom_fields_projects, :custom_fields_trackers, :custom_values
-
   include Redmine::I18n
 
   def setup
@@ -564,6 +552,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   def test_validate_password_complexity
+    set_language_if_valid 'en'
     user = users(:users_002)
     bad_passwords = [
       user.login,
@@ -577,7 +566,7 @@ class UserTest < ActiveSupport::TestCase
       user.password = p
       user.password_confirmation = p
       assert_not user.save
-      assert user.errors.full_messages.include?('Password is too simple')
+      assert_includes user.errors.full_messages, 'Password is too simple'
     end
   end
 

@@ -20,13 +20,6 @@
 require_relative '../application_system_test_case'
 
 class IssuesSystemTest < ApplicationSystemTestCase
-  fixtures :projects, :users, :email_addresses, :roles, :members, :member_roles,
-           :trackers, :projects_trackers, :enabled_modules,
-           :issue_statuses, :issues, :issue_categories,
-           :enumerations, :custom_fields, :custom_values, :custom_fields_trackers,
-           :watchers, :journals, :journal_details, :versions,
-           :workflows
-
   def test_create_issue
     log_user('jsmith', 'jsmith')
     visit '/projects/ecookbook/issues/new'
@@ -504,8 +497,9 @@ class IssuesSystemTest < ApplicationSystemTestCase
     assert_equal 'Copy', submit_buttons[0].value
 
     page.find('#issue_project_id').select('OnlineStore')
-    # wait for ajax response
-    assert page.has_select?('issue_project_id', selected: 'OnlineStore')
+    # Verify that the target version field has been rewritten by the OnlineStore project settings
+    # and wait for the project change to complete.
+    assert_select 'issue_fixed_version_id', options: ['(No change)', 'none', 'Alpha', 'Systemwide visible version']
 
     assert_selector 'input[type=submit]', count: 2
     submit_buttons = page.all('input[type=submit]')

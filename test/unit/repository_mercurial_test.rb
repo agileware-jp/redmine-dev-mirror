@@ -20,8 +20,6 @@
 require_relative '../test_helper'
 
 class RepositoryMercurialTest < ActiveSupport::TestCase
-  fixtures :projects
-
   include Redmine::I18n
 
   REPOSITORY_PATH = Rails.root.join('tmp/test/mercurial_repository').to_s
@@ -170,7 +168,7 @@ class RepositoryMercurialTest < ActiveSupport::TestCase
       @repository.fetch_changesets
       @project.reload
       assert_equal NUM_REV, @repository.changesets.count
-      assert_equal 53, @repository.filechanges.count
+      assert_equal 47, @repository.filechanges.count
       rev0 = @repository.changesets.find_by_revision('0')
       assert_equal "Initial import.\nThe repository contains 3 files.",
                    rev0.comments
@@ -263,13 +261,13 @@ class RepositoryMercurialTest < ActiveSupport::TestCase
         @repository.latest_changesets(
           '/sql_escape/percent%dir/percent%file1.txt', nil
         )
-      assert_equal %w|30 11 10 9|, changesets.collect(&:revision)
+      assert_equal %w|11 10 9|, changesets.collect(&:revision)
 
       changesets =
         @repository.latest_changesets(
           '/sql_escape/underscore_dir/understrike_file.txt', nil
         )
-      assert_equal %w|30 12 9|, changesets.collect(&:revision)
+      assert_equal %w|12 9|, changesets.collect(&:revision)
 
       changesets = @repository.latest_changesets('README', nil)
       assert_equal %w|31 30 28 17 8 6 1 0|, changesets.collect(&:revision)
@@ -286,7 +284,7 @@ class RepositoryMercurialTest < ActiveSupport::TestCase
 
       path = 'sql_escape/percent%dir'
       changesets = @repository.latest_changesets(path, nil)
-      assert_equal %w|30 13 11 10 9|, changesets.collect(&:revision)
+      assert_equal %w|13 11 10 9|, changesets.collect(&:revision)
 
       changesets = @repository.latest_changesets(path, '11')
       assert_equal %w|11 10 9|, changesets.collect(&:revision)
@@ -296,7 +294,7 @@ class RepositoryMercurialTest < ActiveSupport::TestCase
 
       path = 'sql_escape/underscore_dir'
       changesets = @repository.latest_changesets(path, nil)
-      assert_equal %w|30 13 12 9|, changesets.collect(&:revision)
+      assert_equal %w|13 12 9|, changesets.collect(&:revision)
 
       changesets = @repository.latest_changesets(path, '12')
       assert_equal %w|12 9|, changesets.collect(&:revision)

@@ -60,23 +60,23 @@ module ApplicationHelper
     only_path = options[:only_path].nil? ? true : options[:only_path]
     case principal
     when User
-      name = h(principal.name(options[:format]))
-      name = "@".html_safe + name if options[:mention]
+      name = principal.name(options[:format])
+      name = "@#{name}" if options[:mention]
       css_classes = ''
       if principal.active? || (User.current.admin? && principal.logged?)
         url = user_url(principal, :only_path => only_path)
         css_classes += principal.css_classes
       end
     when Group
-      name = h(principal.to_s)
+      name = principal.to_s
       url = group_url(principal, :only_path => only_path)
       css_classes = principal.css_classes
     else
-      name = h(principal.to_s)
+      name = principal.to_s
     end
 
     css_classes += " #{options[:class]}" if css_classes && options[:class].present?
-    url ? link_to(name, url, :class => css_classes) : name
+    url ? link_to(principal_icon(principal).to_s + name, url, :class => css_classes) : h(name)
   end
 
   # Displays a link to edit group page if current user is admin
@@ -346,18 +346,18 @@ module ApplicationHelper
   def thumbnail_tag(attachment)
     thumbnail_size = Setting.thumbnails_size.to_i
     thumbnail_path = thumbnail_path(attachment, :size => thumbnail_size * 2)
-    link_to(
-      image_tag(
-        thumbnail_path,
-        :srcset => "#{thumbnail_path} 2x",
-        :style => "max-width: #{thumbnail_size}px; max-height: #{thumbnail_size}px;",
-        :title => attachment.filename,
-        :loading => "lazy"
-      ),
-      attachment_path(
-        attachment
+    tag.div class: 'thumbnail', title: attachment.filename do
+      link_to(
+        image_tag(
+          thumbnail_path,
+          :srcset => "#{thumbnail_path} 2x",
+          :style => "max-width: #{thumbnail_size}px; max-height: #{thumbnail_size}px;",
+          :alt => attachment.filename,
+          :loading => "lazy"
+        ),
+        attachment_path(attachment)
       )
-    )
+    end
   end
 
   def toggle_link(name, id, options={})
@@ -414,8 +414,16 @@ module ApplicationHelper
   end
 
   def format_activity_description(text)
-    h(text.to_s.truncate(120).gsub(%r{[\r\n]*<(pre|code)>.*$}m, '...')).
-      gsub(/[\r\n]+/, "<br />").html_safe
+    h(
+      # Limit input to avoid regex performance issues
+      text.to_s.slice(0, 10240)
+      # Abbreviate consecutive quoted lines as '> ...', keeping the first line
+      .gsub(%r{(^>.*?(?:\r?\n))(?:>.*?(?:\r?\n)+)+}m, "\\1> ...\n")
+      # Remove all content following the first <pre> or <code> tag
+      .sub(%r{[\r\n]*<(pre|code)>.*$}m, '')
+      # Truncate the description to a specified length and append '...'
+      .truncate(240)
+    ).gsub(/[\r\n]+/, "<br>").html_safe
   end
 
   def format_version_name(version)
@@ -610,7 +618,7 @@ module ApplicationHelper
                   :class => (@project.nil? && controller.class.main_menu ? 'selected' : nil))
     content =
       content_tag('div',
-                  content_tag('div', q, :class => 'quick-search') +
+                  content_tag('div', sprite_icon('search', icon_only: true, size: 18) + q, :class => 'quick-search') +
                     content_tag('div', render_projects_for_jump_box(projects, selected: @project),
                                 :class => 'drdn-items projects selection') +
                     content_tag('div', all, :class => 'drdn-items all-projects selection'),
@@ -655,9 +663,9 @@ module ApplicationHelper
         content_tag(
           'label',
           check_box_tag(name, principal.id, false, :id => nil) +
-            (avatar(principal, :size => 16).presence ||
+            ((avatar(principal, :size => 16).presence if principal.is_a?(User)) ||
                content_tag(
-                 'span', principal_icon(principal.class.name.downcase),
+                 'span', principal_icon(principal),
                  :class => "name icon icon-#{principal.class.name.downcase}"
                )
             ) + principal.to_s
@@ -1661,7 +1669,7 @@ module ApplicationHelper
 
   def checked_image(checked=true)
     if checked
-      @checked_image_tag ||= content_tag(:span, nil, :class => 'icon-only icon-checked')
+      @checked_image_tag ||= content_tag(:span, sprite_icon("checked"), :class => 'icon-only icon-checked')
     end
   end
 
@@ -1790,12 +1798,12 @@ module ApplicationHelper
     tags = javascript_include_tag(
       'jquery-3.7.1-ui-1.13.3',
       'rails-ujs',
-      'tribute-5.1.3.min',
-      'tablesort-5.2.1.min.js',
-      'tablesort-5.2.1.number.min.js',
-      'application',
-      'responsive'
+      'tribute-5.1.3.min'
     )
+    if Setting.wiki_tablesort_enabled?
+      tags << javascript_include_tag('tablesort-5.2.1.min.js', 'tablesort-5.2.1.number.min.js')
+    end
+    tags << javascript_include_tag('application', 'responsive')
     unless User.current.pref.warn_on_leaving_unsaved == '0'
       warn_text = escape_javascript(l(:text_warn_on_leaving_unsaved))
       tags <<

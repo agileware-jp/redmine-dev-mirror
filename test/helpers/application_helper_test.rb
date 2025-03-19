@@ -23,17 +23,6 @@ class ApplicationHelperTest < Redmine::HelperTest
   include ERB::Util
   include AvatarsHelper
 
-  fixtures :projects, :enabled_modules,
-           :users, :email_addresses,
-           :members, :member_roles, :roles,
-           :repositories, :changesets,
-           :projects_trackers,
-           :trackers, :issue_statuses, :issues, :versions, :documents, :journals,
-           :wikis, :wiki_pages, :wiki_contents,
-           :boards, :messages, :news,
-           :attachments, :enumerations,
-           :custom_values, :custom_fields, :custom_fields_projects
-
   def setup
     super
     set_tmp_attachments_directory
@@ -1669,7 +1658,7 @@ class ApplicationHelperTest < Redmine::HelperTest
     end
   end
 
-  if Object.const_defined?(:CommonMarker)
+  if Object.const_defined?(:Commonmarker)
     def test_toc_with_markdown_formatting_should_be_parsed
       with_settings :text_formatting => 'common_mark' do
         assert_select_in textilizable("{{toc}}\n\n# Heading"), 'ul.toc li', :text => 'Heading'
@@ -1868,8 +1857,8 @@ class ApplicationHelperTest < Redmine::HelperTest
 
   def test_link_to_principal_should_link_to_group
     group = Group.find(10)
-    result = link_to('A Team', '/groups/10', :class => 'group')
-    assert_equal result, link_to_principal(group)
+    result = %r{<a class="group" href="/groups/10"><svg class="s18 icon-svg" aria-hidden="true"><use href="/assets/icons-\w+.svg#icon--group"></use></svg>A Team</a>}
+    assert_match result, link_to_principal(group)
   end
 
   def test_link_to_principal_should_return_string_representation_for_unknown_type_principal
@@ -1929,11 +1918,12 @@ class ApplicationHelperTest < Redmine::HelperTest
   end
 
   def test_thumbnail_tag
-    a = Attachment.find(3)
-    assert_select_in(
-      thumbnail_tag(a),
-      'a[href=?] img[title=?][src=?][loading="lazy"]',
-      "/attachments/3", "logo.gif", "/attachments/thumbnail/3/200")
+    attachment = Attachment.find(3)
+    assert_select_in thumbnail_tag(attachment), 'div.thumbnail[title=?]', 'logo.gif' do
+      assert_select 'a[href=?]', '/attachments/3' do
+        assert_select 'img[alt=?][src=?][loading="lazy"]', "logo.gif", "/attachments/thumbnail/3/200"
+      end
+    end
   end
 
   def test_link_to_project
@@ -2008,13 +1998,18 @@ class ApplicationHelperTest < Redmine::HelperTest
   end
 
   def test_principals_check_box_tag_with_avatar
-    principals = [User.find(1), Group.find(10)]
+    user = User.find(1)
+    group = Group.find(10)
     with_settings :gravatar_enabled => '1' do
-      tags = principals_check_box_tags("watcher[user_ids][]", principals)
-      principals.each do |principal|
-        assert_include avatar(principal, :size => 16), tags
-        assert_not_include content_tag('span', nil, :class => "name icon icon-#{principal.class.name.downcase}"), tags
-      end
+      tags = principals_check_box_tags("watcher[user_ids][]", [user, group])
+
+      # User should have avatar
+      assert_include avatar(user, :size => 16), tags
+      assert_not_include content_tag('span', nil, :class => "name icon icon-#{user.class.name.downcase}"), tags
+
+      # Group should have group icon
+      assert_not_include avatar(group, :size => 16), tags
+      assert_include content_tag('span', principal_icon(group), :class => "name icon icon-#{group.class.name.downcase}"), tags
     end
   end
 
@@ -2027,7 +2022,7 @@ class ApplicationHelperTest < Redmine::HelperTest
       tags = principals_check_box_tags(name, principals)
       principals.each_with_index do |principal, i|
         assert_not_include avatar_tags[i], tags
-        assert_include content_tag('span', principal_icon(principal.class.name.downcase), :class => "name icon icon-#{principal.class.name.downcase}"), tags
+        assert_include content_tag('span', principal_icon(principal), :class => "name icon icon-#{principal.class.name.downcase}"), tags
       end
     end
   end
@@ -2215,11 +2210,15 @@ class ApplicationHelperTest < Redmine::HelperTest
     set_language_if_valid 'en'
 
     with_settings :timespan_format => 'minutes' do
+      assert_equal '-0:45', format_hours(-0.75)
+      assert_equal '0:00', format_hours(0)
       assert_equal '0:45', format_hours(0.75)
       assert_equal '0:45 h', l_hours_short(0.75)
       assert_equal '0:45 hour', l_hours(0.75)
     end
     with_settings :timespan_format => 'decimal' do
+      assert_equal '-0.75', format_hours(-0.75)
+      assert_equal '0.00', format_hours(0)
       assert_equal '0.75', format_hours(0.75)
       assert_equal '0.75 h', l_hours_short(0.75)
       assert_equal '0.75 hour', l_hours(0.75)
@@ -2333,6 +2332,35 @@ class ApplicationHelperTest < Redmine::HelperTest
       assert_equal ';', l(:general_csv_separator)
       assert_select_in result, 'option[value=?][selected=selected]', ';'
     end
+  end
+
+  def test_format_activity_description_should_strip_quoted_text
+    text = <<~TEXT
+      John Smith wrote in #note-1:
+      > The quick brown fox
+      > jumps over the lazy dog.
+
+      Brick quiz whangs jumpy veldt fox.
+
+      > The five
+
+      > boxing wizards
+
+      > jump quickly.
+
+      The quick onyx goblin jumps over the lazy dwarf.
+    TEXT
+
+    expected =
+      'John Smith wrote in #note-1:<br>' \
+      '&gt; The quick brown fox<br>' \
+      '&gt; ...<br>' \
+      'Brick quiz whangs jumpy veldt fox.<br>' \
+      '&gt; The five<br>' \
+      '&gt; ...<br>' \
+      'The quick onyx goblin jumps over the lazy dwarf.<br>'
+
+    assert_equal expected, format_activity_description(text)
   end
 
   private

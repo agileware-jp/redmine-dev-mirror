@@ -27,7 +27,7 @@
         <div class="flyout-menu__search">
             <%= form_tag(search_path(id: @project), :method => :get ) do %>
             <%= hidden_field_tag(controller.default_search_scope, 1, :id => nil) if controller.default_search_scope %>
-            <%= label_tag 'flyout-search', '&#9906;'.html_safe, :class => 'search-magnifier search-magnifier--flyout' %>
+            <%= label_tag 'flyout-search', sprite_icon('search', l(:label_search), icon_only: true), :class => 'search-magnifier search-magnifier--flyout' %>
             <%= text_field_tag 'q', @question, :id => 'flyout-search', :class => 'small js-search-input', :placeholder => l(:label_search) %>
             <% end %>
         </div>
@@ -100,10 +100,20 @@
     <% end %>
 </div>
 
-<div id="main" class="<%= sidebar_content? ? '' : 'nosidebar' %>">
+<div id="main" class="<%= sidebar_content? ? 'collapsiblesidebar' : 'nosidebar' %>">
+  <%= javascript_tag "$('#main.collapsiblesidebar').collapsibleSidebar();" if sidebar_content? %>
     <div id="sidebar">
-        <%= yield :sidebar %>
-        <%= view_layouts_base_sidebar_hook_response %>
+        <% if sidebar_content? %>
+          <div id="sidebar-switch-panel" style="visibility: hidden;">
+            <a id="sidebar-switch-button" class="" href="#">
+              <%= sprite_icon("chevrons-right", size: 20) %></a>
+          </div>
+          <%= javascript_tag "$('#sidebar-switch-panel').css('visibility', 'visible');" %>
+        <% end %>
+        <div id="sidebar-wrapper">
+          <%= yield :sidebar %>
+          <%= view_layouts_base_sidebar_hook_response %>
+        </div>
     </div>
 
     <div id="content">
@@ -114,7 +124,7 @@
     </div>
 </div>
 <div id="footer">
-    Powered by <%= link_to Redmine::Info.app_name, Redmine::Info.url, :target => '_blank', :rel => 'noopener' %> &copy; 2006-2024 Jean-Philippe Lang
+    Powered by <%= link_to Redmine::Info.app_name, Redmine::Info.url, :target => '_blank', :rel => 'noopener' %> &copy; 2006-2025 Jean-Philippe Lang
 </div>
 
 <div id="ajax-indicator" style="display:none;"><span><%= l(:label_loading) %></span></div>

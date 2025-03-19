@@ -20,34 +20,6 @@
 require_relative '../test_helper'
 
 class IssuesControllerTest < Redmine::ControllerTest
-  fixtures :projects,
-           :users, :email_addresses, :user_preferences,
-           :roles,
-           :members,
-           :member_roles,
-           :issues,
-           :issue_statuses,
-           :issue_relations,
-           :versions,
-           :trackers,
-           :projects_trackers,
-           :issue_categories,
-           :enabled_modules,
-           :enumerations,
-           :attachments,
-           :workflows,
-           :custom_fields,
-           :custom_values,
-           :custom_fields_projects,
-           :custom_fields_trackers,
-           :time_entries,
-           :journals,
-           :journal_details,
-           :queries,
-           :repositories,
-           :changesets,
-           :watchers, :groups_users
-
   include Redmine::I18n
 
   def setup
@@ -360,7 +332,7 @@ class IssuesControllerTest < Redmine::ControllerTest
       # assert link properties
       assert_select(
         'a.query.selected[title=?][href=?]',
-        'Description for Oepn issues by priority and tracker',
+        'Description for Open issues by priority and tracker',
         '/projects/ecookbook/issues?query_id=5',
         :text => "Open issues by priority and tracker"
       )
@@ -2670,18 +2642,47 @@ class IssuesControllerTest < Redmine::ControllerTest
   end
 
   def test_show_should_not_display_prev_next_links_for_issue_not_in_query_results
-    @request.session[:issue_query] =
-      {
-        :filters => {
-          'status_id' => {:values => [''], :operator => 'c'}
-        },
-        :project_id => 1,
-        :sort => [['id', 'asc']]
-      }
-    get(:show, :params => {:id => 1})
+    @request.session[:issue_query] = {
+      filters: {
+        'status_id' => {operator: 'o', values: ['']}
+      },
+      project_id: 1,
+      sort: [['id', 'asc']]
+    }
+    get(:show, params: {id: 8})
+
     assert_response :success
-    assert_select 'a', :text => /Previous/, :count => 0
-    assert_select 'a', :text => /Next/, :count => 0
+    assert_select 'a', text: /Previous/, count: 0
+    assert_select 'a', text: /Next/, count: 0
+  end
+
+  def test_show_should_display_prev_next_links_for_issue_not_in_query_when_flash_contains_previous_and_next_issue_ids
+    @request.session[:issue_query] = {
+      filters: {
+        'status_id' => {operator: 'o', values: ['']}
+      },
+      project_id: 1,
+      sort: [['id', 'asc']]
+    }
+    get(
+      :show,
+      params: { id: 8 }, # The issue#8 is closed
+      flash: {
+        previous_and_next_issue_ids: {
+          prev_issue_id: 7,
+          next_issue_id: 9,
+          issue_position: 7,
+          issue_count: 10
+        }
+      }
+    )
+
+    assert_response :success
+    assert_select 'div.next-prev-links' do
+      assert_select 'a[href="/issues/7"]', text: /Previous/
+      assert_select 'a[href="/issues/9"]', text: /Next/
+      assert_select 'span.position', text: "7 of 10"
+    end
   end
 
   def test_show_show_should_display_prev_next_links_with_query_sort_by_user_custom_field
@@ -2709,25 +2710,6 @@ class IssuesControllerTest < Redmine::ControllerTest
     assert_select 'div.next-prev-links' do
       assert_select 'a[href="/issues/2"]', :text => /Previous/
       assert_select 'a[href="/issues/1"]', :text => /Next/
-    end
-  end
-
-  def test_show_should_display_prev_next_links_when_request_has_previous_and_next_issue_ids_params
-    get(
-      :show,
-      :params => {
-        :id => 1,
-        :prev_issue_id => 1,
-        :next_issue_id => 3,
-        :issue_position => 2,
-        :issue_count => 4
-      }
-    )
-    assert_response :success
-    assert_select 'div.next-prev-links' do
-      assert_select 'a[href="/issues/1"]', :text => /Previous/
-      assert_select 'a[href="/issues/3"]', :text => /Next/
-      assert_select 'span.position', :text => "2 of 4"
     end
   end
 
@@ -2827,7 +2809,8 @@ class IssuesControllerTest < Redmine::ControllerTest
         assert_select 'a[class*=delete]'
       end
       assert_select "li.user-10" do
-        assert_select 'img.gravatar[title=?]', 'A Team'
+        assert_select 'a.group', :text => 'A Team'
+        assert_select 'svg'
         assert_select 'a[href="/groups/10"]'
         assert_select 'a[class*=delete]'
       end
@@ -5992,7 +5975,10 @@ class IssuesControllerTest < Redmine::ControllerTest
 
     assert_response :success
     reason = l(:notice_issue_not_closable_by_blocking_issue)
-    assert_select 'span.icon-warning[title=?]', reason, :text => reason
+    assert_select 'span.icon-warning[title=?]', reason do
+      assert_select "svg.icon-svg use:match('href', ?)", /assets\/icons-\w+.svg#icon--warning/
+      assert_select 'span.icon-label', test: reason
+    end
   end
 
   def test_get_edit_should_display_visible_spent_time_custom_field
@@ -6927,7 +6913,11 @@ class IssuesControllerTest < Redmine::ControllerTest
         :issue_count => 3
       }
     )
-    assert_redirected_to '/issues/11?issue_count=3&issue_position=2&next_issue_id=12&prev_issue_id=8'
+    assert_redirected_to '/issues/11'
+    assert_equal(
+      { issue_count: '3', issue_position: '2', next_issue_id: '12', prev_issue_id: '8' },
+      flash[:previous_and_next_issue_ids]
+    )
   end
 
   def test_update_with_permission_on_tracker_should_be_allowed

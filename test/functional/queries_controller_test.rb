@@ -20,13 +20,6 @@
 require_relative '../test_helper'
 
 class QueriesControllerTest < Redmine::ControllerTest
-  fixtures :projects, :enabled_modules,
-           :users, :email_addresses,
-           :members, :member_roles, :roles,
-           :trackers, :issue_statuses, :issue_categories, :enumerations, :versions,
-           :issues, :custom_fields, :custom_values,
-           :queries
-
   def setup
     User.current = nil
   end
@@ -607,11 +600,11 @@ class QueriesControllerTest < Redmine::ControllerTest
   def test_create_admin_projects_query_should_redirect_to_admin_projects
     @request.session[:user_id] = 1
 
-    q = new_record(ProjectQuery) do
+    q = new_record(ProjectAdminQuery) do
       post(
         :create,
         :params => {
-          :type => 'ProjectQuery',
+          :type => 'ProjectAdminQuery',
           :default_columns => '1',
           :f => ["status"],
           :op => {
@@ -622,13 +615,12 @@ class QueriesControllerTest < Redmine::ControllerTest
           },
           :query => {
             "name" => "test_new_project_public_query", "visibility" => "2"
-          },
-          :admin_projects => 1
+          }
         }
       )
     end
 
-    assert_redirected_to :controller => 'admin', :action => 'projects', :query_id => q.id, :admin_projects => 1
+    assert_redirected_to :controller => 'admin', :action => 'projects', :query_id => q.id
   end
 
   def test_edit_global_public_query
@@ -683,7 +675,7 @@ class QueriesControllerTest < Redmine::ControllerTest
     get(:edit, :params => {:id => 5})
     assert_response :success
 
-    assert_select 'input[name="query[description]"][value=?]', 'Description for Oepn issues by priority and tracker'
+    assert_select 'input[name="query[description]"][value=?]', 'Description for Open issues by priority and tracker'
   end
 
   def test_edit_invalid_query
@@ -745,7 +737,7 @@ class QueriesControllerTest < Redmine::ControllerTest
   end
 
   def test_update_admin_projects_query
-    q = ProjectQuery.create(:name => 'project_query')
+    q = ProjectAdminQuery.create(:name => 'project_query')
     @request.session[:user_id] = 1
 
     put(
@@ -762,12 +754,11 @@ class QueriesControllerTest < Redmine::ControllerTest
         },
         :query => {
           "name" => "test_project_query_updated", "visibility" => "2"
-        },
-        :admin_projects => 1
+        }
       }
     )
 
-    assert_redirected_to :controller => 'admin', :action => 'projects', :query_id => q.id, :admin_projects => 1
+    assert_redirected_to :controller => 'admin', :action => 'projects', :query_id => q.id
     assert Query.find_by_name('test_project_query_updated')
   end
 

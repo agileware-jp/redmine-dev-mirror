@@ -122,17 +122,17 @@ module Propshaft
   Assembly.prepend(Module.new do
     def initialize(config)
       super
-      if Rails.application.config.assets.redmine_detect_update && (!manifest_path.exist? || manifest_outdated?)
+      if Rails.application.config.assets.redmine_detect_update && (!config.manifest_path.exist? || manifest_outdated?)
         processor.process
       end
     end
 
     def manifest_outdated?
-      !!load_path.asset_files.detect{|f| f.mtime > manifest_path.mtime}
+      !!load_path.asset_files.detect{|f| f.mtime > config.manifest_path.mtime}
     end
 
     def load_path
-      @load_path ||= Redmine::AssetLoadPath.new(config)
+      @load_path ||= Redmine::AssetLoadPath.new(config, compilers)
     end
   end)
 
