@@ -815,7 +815,7 @@ class User < Principal
   def notify_about?(object)
     if mail_notification == 'all'
       true
-    elsif mail_notification.blank? || mail_notification == 'none'
+    elsif mail_notification == 'none'
       false
     else
       case object
