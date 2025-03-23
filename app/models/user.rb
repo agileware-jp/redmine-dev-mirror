@@ -157,6 +157,10 @@ class User < Principal
     end
   end)
 
+  def normalized_mail_notification
+    mail_notification.presence || 'none'
+  end
+
   def set_mail_notification
     self.mail_notification = Setting.default_notification_option if self.mail_notification.blank?
     true
