@@ -157,8 +157,17 @@ class User < Principal
     end
   end)
 
+  def mail_notification
+    notification = read_attribute(:mail_notification)
+    if MAIL_NOTIFICATION_OPTIONS.any? { |option_value, _label| option_value == notification }
+      notification
+    else
+      'none'
+    end
+  end
+
   def set_mail_notification
-    self.mail_notification = Setting.default_notification_option if self.mail_notification.blank?
+    self.mail_notification = Setting.default_notification_option if self[:mail_notification].blank?
     true
   end
 
