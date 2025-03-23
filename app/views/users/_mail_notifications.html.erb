@@ -3,7 +3,7 @@
 <%= select_tag(
       'user[mail_notification]',
       options_for_select(
-         user_mail_notification_options(@user), @user.mail_notification),
+         user_mail_notification_options(@user), @user.normalized_mail_notification),
       :onchange => 'if (this.value == "selected") {$("#notified-projects").show();} else {$("#notified-projects").hide();}'
      ) %>
 </p>
