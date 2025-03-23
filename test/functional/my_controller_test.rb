@@ -416,6 +416,16 @@ class MyControllerTest < Redmine::ControllerTest
     end
   end
 
+  def test_my_account_should_show_no_events_email_notification_when_empty_mail_notification
+    user = User.find(2)
+    user.mail_notification = ''
+    user.save(validate: false)
+
+    get :account
+    assert_response :success
+    assert_select 'select[name=?] option[selected]', 'user[mail_notification]', text: 'No events'
+  end
+
   def test_page_with_calendar
     date = '2020-10-21'
     subject = 'calendar on my page'
